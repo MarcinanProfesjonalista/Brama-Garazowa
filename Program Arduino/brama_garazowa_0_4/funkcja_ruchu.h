@@ -37,7 +37,7 @@ void stopSilnik() {
   jedzie_w_gore = false;
   jedzie_w_dol = false;
   pwmValue = 0;
-  trybSET = false;
+  // trybSET = false; //Zakomentowano ze względ na 
 digitalWrite(enablePin, LOW);
   ledcWrite(turnLeftPin, 0);
   ledcWrite(turnRightPin, 0);
@@ -61,16 +61,55 @@ bool zmianaKierunku(bool chceWGore, bool chceWDol) {
   return false;
 }
 
+void zamykanie_po_czasie() {
+
+  if (!trybSET) {
+    autoZamykanieAktywne = false;
+    return;
+  }
+
+  // warunek: brama stoi na krańcówce dolnej
+  // (jeśli to jednak ma być górna – zamień na krGorna)
+  if (krDolna && !jedzie_w_gore && !jedzie_w_dol) {
+
+    if (!autoZamykanieAktywne) {
+      czasStartAutoZamykania = millis();
+      autoZamykanieAktywne = true;
+    }
+
+    if (millis() - czasStartAutoZamykania >= czasAutoZamykania) {
+
+      // Start jazdy w dół (jak tryb SET)
+      jedzie_w_dol = true;
+      jedzie_w_gore = false;
+      startCzasJazdy = millis();
+      pwmValue = 0;
+      trybSET = true;
+
+      autoZamykanieAktywne = false;
+    }
+
+  } else {
+    // jeśli brama się ruszyła lub zeszła z krańcówki – reset timera
+    autoZamykanieAktywne = false;
+  }
+}
+
 void jazda() {
 
   bool momentaryUp = BUTTON_UP_MOMENTARY_PIN_wcisniety || PILOT_UP_PIN_A_MOMENTARY_wcisniety;
   bool momentaryDown = BUTTON_DOWN_MOMENTARY_PIN_wcisniety || PILOT_DOWN_PIN_B_MOMENTARY_wcisniety;
   bool setUp = BUTTON_UP_SET_PIN_wcisniety || PILOT_UP_Bi_SET_PIN_wcisniety;
-  bool setDown = BUTTON_DOWN_SET_PIN_wcisniety || PILOT_DOWN_Ai_SET_PIN_wcisniety;
+  bool setDown = BUTTON_DOWN_SET_PIN_wcisniety 
+            || PILOT_DOWN_Ai_SET_PIN_wcisniety
+            || autoSetDown;
+
   bool chceWGore = momentaryUp || setUp;
   bool chceWDol = momentaryDown || setDown;
 
   if (chceWGore || chceWDol) autoStop = false;
+
+  
 
   // =====================
   // ZMIANA KIERUNKU
@@ -91,6 +130,7 @@ void jazda() {
   }
 
   if (momentaryUp && !krGorna) {
+    
     trybSET = false;
     pwmValue = pwmMax;
     wlaczSSR();
@@ -124,6 +164,7 @@ void jazda() {
     }
 
     else if (setDown && !krDolna) {
+      autoSetDown = false;   // <-- DODAJ
       trybSET = true;
       jedzie_w_dol = true;
       jedzie_w_gore = false;

@@ -48,3 +48,10 @@ const unsigned long czasZamykania  = 33000;
 const unsigned long deadTime = 300;
 
 
+//Autozamykanie
+unsigned long czasStartAutoZamykania = 0;
+bool autoZamykanieAktywne = false;
+const unsigned long czasAutoZamykania = 10UL * 60UL * 1000UL; // 10 minut
+bool blokadaAutoZamykania = false;
+
+
