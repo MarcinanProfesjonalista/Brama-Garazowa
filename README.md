@@ -1,3 +1,9 @@
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/MarcinanProfesjonalista/Brama-Garazowa/main/brama%20garazowa/plyta%201.7.png"
+    alt="Płyta sterownika v1.7"
+    width="600">
+</p>
 # 🚪 Automat Bramy Garażowej – System Sterowania
 
 Nowoczesny sterownik do automatyzacji bramy garażowej oparty o mikrokontroler **ESP**, umożliwiający lokalne i bezprzewodowe sterowanie napędem prądu stałego.
